@@ -1,0 +1,26 @@
+# vigil — runtime data
+pi/data/
+*.mp4
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Node / Next.js (web/)
+node_modules/
+.next/
+.vercel/
+
+# OS
+.DS_Store
+
+# Local overrides & secrets
+**/vigil.local.yaml
+.env
+.env.local
+**/.env
+**/.env.local

@@ -1,0 +1,19 @@
+[Unit]
+Description=vigil uploader — ship mp4 files to object storage
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=vigil
+Group=vigil
+WorkingDirectory=/opt/vigil
+EnvironmentFile=-/etc/vigil/.env
+ExecStart=/opt/vigil/scripts/start_uploader.sh --config /etc/vigil/vigil.yaml
+Restart=on-failure
+RestartSec=30
+KillSignal=SIGTERM
+TimeoutStopSec=60
+
+[Install]
+WantedBy=multi-user.target

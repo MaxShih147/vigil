@@ -1,0 +1,37 @@
+device:
+  id: vigil-dev
+  location: dev-mac
+
+# Camera input. The recorder picks the right ffmpeg input format
+# based on the host platform (avfoundation on macOS, v4l2 on Linux),
+# and uses the matching `device` field below.
+camera:
+  device_macos: "0"           # AVFoundation index ("0" = default webcam)
+  device_linux: /dev/video0
+  resolution: 1280x720
+  fps: 30
+
+recording:
+  segment_seconds: 600        # 10 minutes per file
+  format: mp4
+  codec: libx264              # change to h264_v4l2m2m on Pi for hardware encode
+  preset: veryfast
+  output_dir: ./data/recordings
+  filename_pattern: "vigil_%Y-%m-%d_%H-%M-%S.mp4"
+
+storage:
+  keep_local_days: 3
+  max_disk_usage_percent: 85
+
+# Upload to S3-compatible object storage (defaulting to Cloudflare R2).
+# Credentials live in pi/.env (see pi/.env.example) — never commit them.
+upload:
+  enabled: true
+  bucket: vigil-recordings
+  region: auto                  # R2 ignores region; "auto" is the convention
+  scan_interval_seconds: 30
+  stability_grace_seconds: 30   # mp4 must be untouched this long before upload
+  delete_after_upload: false    # false → moved to data/uploaded/, true → deleted
+
+network:
+  retry_interval_seconds: 60
