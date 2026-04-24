@@ -18,6 +18,9 @@ node_modules/
 # OS
 .DS_Store
 
+# Claude Code workspace settings (contains tool allow-lists with verbatim commands)
+.claude/
+
 # Local overrides & secrets
 **/vigil.local.yaml
 .env
