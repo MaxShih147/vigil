@@ -1,5 +1,6 @@
 device:
   id: vigil-dev
+  label: dev mac
   location: dev-mac
 
 # Camera input. The recorder picks the right ffmpeg input format
@@ -35,3 +36,9 @@ upload:
 
 network:
   retry_interval_seconds: 60
+
+# Agent reports state to the dashboard and pulls pending commands.
+# VIGIL_DEVICE_API_KEY + VIGIL_DASHBOARD_URL must be set in pi/.env.
+agent:
+  heartbeat_interval_seconds: 10
+  cleanup_every_iterations: 60      # ≈ every 10 min when interval is 10s

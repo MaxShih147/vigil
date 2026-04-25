@@ -6,7 +6,6 @@ import {
   denyRequest,
   revokeAccess,
 } from "./actions";
-import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
 
@@ -24,54 +23,69 @@ export default async function AdminPage() {
   ]);
 
   return (
-    <main className="container mx-auto max-w-3xl p-6 md:p-10 space-y-12">
-      <header className="pb-6 border-b">
-        <h1 className="text-3xl font-bold">Admin</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Manage who can sign in to vigil.
+    <main className="container mx-auto max-w-4xl px-6 md:px-10 pt-10 pb-20">
+      {/* Hero */}
+      <header className="mb-12 relative">
+        <div className="font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground/70 mb-3">
+          Dept 02 · Access Control
+        </div>
+        <h1 className="font-bricolage text-5xl md:text-6xl font-semibold tracking-[-0.04em] leading-[0.95]">
+          The roster.
+        </h1>
+        <p className="text-muted-foreground max-w-xl text-sm leading-relaxed mt-4">
+          Approve or revoke access. Approvals take effect on the user&apos;s
+          next sign-in attempt.
         </p>
       </header>
 
-      <section>
-        <h2 className="text-xl font-semibold mb-3">
-          Pending requests
-          <span className="text-sm font-normal text-muted-foreground ml-2">
-            {pending.length}
-          </span>
-        </h2>
+      {/* Pending */}
+      <section className="mb-16">
+        <SectionHeader
+          number="01"
+          title="Pending requests"
+          count={pending.length}
+          accent="amber"
+        />
+
         {pending.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No pending requests.</p>
+          <Empty text="No pending requests." />
         ) : (
-          <ul className="space-y-3">
+          <ul className="border-y border-border/60 divide-y divide-border/40">
             {pending.map((req) => (
-              <li
-                key={req.id}
-                className="border rounded-lg p-4 flex flex-col md:flex-row md:items-start justify-between gap-4"
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium">{req.name || req.email}</div>
-                  <div className="text-sm text-muted-foreground font-mono">
-                    {req.email}
+              <li key={req.id} className="py-5 grid md:grid-cols-[1fr_auto] gap-4 items-start">
+                <div className="min-w-0">
+                  <div className="flex items-baseline gap-3 mb-1">
+                    <span className="font-bricolage text-lg font-medium tracking-tight truncate">
+                      {req.name || req.email}
+                    </span>
+                    {req.name && (
+                      <span className="font-mono text-xs text-muted-foreground truncate">
+                        {req.email}
+                      </span>
+                    )}
                   </div>
                   {req.reason && (
-                    <p className="text-sm mt-2 italic break-words">
+                    <p className="text-sm text-muted-foreground italic leading-relaxed mt-2 max-w-2xl">
                       &ldquo;{req.reason}&rdquo;
                     </p>
                   )}
-                  <div className="text-xs text-muted-foreground mt-2">
+                  <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground/60 mt-2">
                     {new Date(req.requestedAt).toLocaleString()}
                   </div>
                 </div>
-                <div className="flex gap-2 shrink-0">
+                <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.22em]">
                   <form
                     action={async () => {
                       "use server";
                       await approveRequest(req.id);
                     }}
                   >
-                    <Button type="submit" size="sm">
-                      Approve
-                    </Button>
+                    <button
+                      type="submit"
+                      className="bg-foreground text-background px-4 py-2 hover:bg-teal transition-colors"
+                    >
+                      ✓ Approve
+                    </button>
                   </form>
                   <form
                     action={async () => {
@@ -79,9 +93,12 @@ export default async function AdminPage() {
                       await denyRequest(req.id);
                     }}
                   >
-                    <Button type="submit" size="sm" variant="outline">
-                      Deny
-                    </Button>
+                    <button
+                      type="submit"
+                      className="text-muted-foreground hover:text-warn transition-colors px-2 py-2"
+                    >
+                      ✗ Deny
+                    </button>
                   </form>
                 </div>
               </li>
@@ -90,46 +107,91 @@ export default async function AdminPage() {
         )}
       </section>
 
+      {/* Allowed */}
       <section>
-        <h2 className="text-xl font-semibold mb-3">
-          Allowed emails
-          <span className="text-sm font-normal text-muted-foreground ml-2">
-            {allowed.length}
-          </span>
-        </h2>
+        <SectionHeader
+          number="02"
+          title="Allowed emails"
+          count={allowed.length}
+          accent="teal"
+        />
+
         {allowed.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            Nobody approved yet (besides admin via env var).
-          </p>
+          <Empty text="Nobody approved yet (admin emails are auto-allowed via env var)." />
         ) : (
-          <ul className="border rounded-lg divide-y">
+          <ul className="border-y border-border/60 divide-y divide-border/40">
             {allowed.map((row) => (
               <li
                 key={row.email}
-                className="flex items-center justify-between px-4 py-2"
+                className="py-3 flex items-center justify-between gap-3"
               >
-                <div>
-                  <div className="font-mono text-sm">{row.email}</div>
-                  <div className="text-xs text-muted-foreground">
-                    added {new Date(row.addedAt).toLocaleDateString()}
-                    {row.addedBy && ` · by ${row.addedBy}`}
-                  </div>
+                <div className="min-w-0 flex items-center gap-3">
+                  <span className="text-teal text-xs">●</span>
+                  <span className="font-mono text-sm truncate">
+                    {row.email}
+                  </span>
                 </div>
-                <form
-                  action={async () => {
-                    "use server";
-                    await revokeAccess(row.email);
-                  }}
-                >
-                  <Button type="submit" size="sm" variant="ghost">
-                    Revoke
-                  </Button>
-                </form>
+                <div className="flex items-center gap-4 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground/70">
+                  <span className="hidden sm:inline">
+                    added {new Date(row.addedAt).toLocaleDateString()}
+                    {row.addedBy &&
+                      `  · by ${row.addedBy.split("@")[0]}`}
+                  </span>
+                  <form
+                    action={async () => {
+                      "use server";
+                      await revokeAccess(row.email);
+                    }}
+                  >
+                    <button
+                      type="submit"
+                      className="text-muted-foreground/60 hover:text-warn transition-colors"
+                    >
+                      Revoke
+                    </button>
+                  </form>
+                </div>
               </li>
             ))}
           </ul>
         )}
       </section>
     </main>
+  );
+}
+
+function SectionHeader({
+  number,
+  title,
+  count,
+  accent,
+}: {
+  number: string;
+  title: string;
+  count: number;
+  accent: "amber" | "teal";
+}) {
+  return (
+    <div className="flex items-baseline justify-between border-b border-border/60 pb-2 mb-1">
+      <div className="flex items-baseline gap-4">
+        <span
+          className={`font-mono text-[10px] uppercase tracking-[0.3em] ${
+            accent === "amber" ? "text-amber" : "text-teal"
+          }`}
+        >
+          §{number}
+        </span>
+        <h2 className="font-bricolage text-2xl tracking-tight">{title}</h2>
+      </div>
+      <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground/70">
+        {count} {count === 1 ? "entry" : "entries"}
+      </span>
+    </div>
+  );
+}
+
+function Empty({ text }: { text: string }) {
+  return (
+    <p className="text-sm text-muted-foreground/70 italic py-8 px-1">{text}</p>
   );
 }

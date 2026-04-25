@@ -1,0 +1,19 @@
+[Unit]
+Description=vigil agent — heartbeat, command poll, periodic cleanup
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=vigil
+Group=vigil
+WorkingDirectory=/opt/vigil
+EnvironmentFile=-/etc/vigil/.env
+ExecStart=/opt/vigil/scripts/start_agent.sh --config /etc/vigil/vigil.yaml
+Restart=on-failure
+RestartSec=10
+KillSignal=SIGTERM
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target

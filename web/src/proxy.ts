@@ -8,7 +8,8 @@ export default auth((req) => {
   if (
     path.startsWith("/signin") ||
     path.startsWith("/request-access") ||
-    path.startsWith("/api/auth")
+    path.startsWith("/api/auth") ||
+    path.startsWith("/api/devices") // Pi → API uses bearer token, not session
   ) {
     return NextResponse.next();
   }

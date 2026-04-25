@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import { accessRequests } from "@/lib/db/schema";
-import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +28,9 @@ async function alreadyPending(email: string): Promise<boolean> {
 
 async function submit(formData: FormData) {
   "use server";
-  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const email = String(formData.get("email") ?? "")
+    .trim()
+    .toLowerCase();
   const name = String(formData.get("name") ?? "").trim();
   const reason = String(formData.get("reason") ?? "").trim();
   if (!email) return;
@@ -57,13 +58,26 @@ export default async function RequestAccessPage({
 
   if (params.submitted) {
     return (
-      <main className="container mx-auto max-w-md px-6 pt-32 text-center">
-        <h1 className="text-2xl font-bold mb-3">Request received</h1>
-        <p className="text-sm text-muted-foreground">
-          Max will notify you once you&apos;re on the list. Then come back and
-          sign in again with{" "}
-          <span className="font-mono">{email}</span>.
-        </p>
+      <main className="min-h-screen flex items-center justify-center px-6 py-20">
+        <div className="w-full max-w-md text-center">
+          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-teal mb-4">
+            ✓ filed
+          </div>
+          <h1 className="font-bricolage text-3xl tracking-[-0.025em] mb-4">
+            Your request has been logged.
+          </h1>
+          <p className="text-sm text-muted-foreground leading-relaxed mb-8">
+            Max will review and notify you out-of-band. Once approved, return
+            here and sign in with{" "}
+            <span className="font-mono text-foreground">{email}</span>.
+          </p>
+          <a
+            href="/signin"
+            className="inline-block font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground hover:text-foreground transition-colors border-b border-border/60 hover:border-foreground pb-1"
+          >
+            ← back to sign-in
+          </a>
+        </div>
       </main>
     );
   }
@@ -71,57 +85,135 @@ export default async function RequestAccessPage({
   const pending = email ? await alreadyPending(email) : false;
 
   return (
-    <main className="container mx-auto max-w-md px-6 pt-24">
-      <h1 className="text-2xl font-bold mb-2">Request access to vigil</h1>
-      <p className="text-sm text-muted-foreground mb-6">
-        {email
-          ? `${email} isn't on the access list yet.`
-          : "Tell Max who you are so he can grant access."}
-      </p>
-
-      {pending ? (
-        <div className="border rounded-lg p-4 text-sm">
-          You already have a pending request for{" "}
-          <span className="font-mono">{email}</span>. Sit tight — Max will
-          ping you.
+    <main className="min-h-screen flex items-center justify-center px-6 py-20">
+      <div className="w-full max-w-md">
+        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-amber mb-4">
+          ◐ access · denied (pending review)
         </div>
-      ) : (
-        <form action={submit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
-            <input
+        <h1 className="font-bricolage text-3xl tracking-[-0.025em] leading-tight mb-3">
+          Request access to vigil.
+        </h1>
+        <p className="text-sm text-muted-foreground leading-relaxed mb-8">
+          {email ? (
+            <>
+              <span className="font-mono text-foreground">{email}</span>{" "}
+              isn&apos;t on the access list. Submit a request and Max will
+              review it.
+            </>
+          ) : (
+            "Tell Max who you are so he can grant access."
+          )}
+        </p>
+
+        {pending ? (
+          <div className="border border-border/60 bg-card/50 p-5 text-sm leading-relaxed">
+            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-amber mb-2">
+              already in queue
+            </div>
+            You have a pending request for{" "}
+            <span className="font-mono text-foreground">{email}</span>. Sit
+            tight — Max will reach out.
+          </div>
+        ) : (
+          <form action={submit} className="space-y-5">
+            <Field
+              label="Email"
+              hint="Google account you want access for"
               name="email"
               type="email"
               required
               defaultValue={email}
-              className="w-full border rounded px-3 py-2 text-sm"
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Name</label>
-            <input
+            <Field
+              label="Name"
+              hint="Optional — what should Max call you?"
               name="name"
               type="text"
               defaultValue={name}
-              className="w-full border rounded px-3 py-2 text-sm"
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Why do you need access?
-            </label>
-            <textarea
+            <Textarea
+              label="Reason"
+              hint="One line is plenty"
               name="reason"
               rows={3}
-              className="w-full border rounded px-3 py-2 text-sm"
-              placeholder="e.g. I'm Fred and I need the printer-room footage from last Tuesday."
+              placeholder="e.g. I need the printer-room footage from Tuesday."
             />
-          </div>
-          <Button type="submit" className="w-full">
-            Submit request
-          </Button>
-        </form>
-      )}
+            <button
+              type="submit"
+              className="w-full bg-foreground text-background font-mono uppercase tracking-[0.2em] text-xs py-3.5 hover:bg-amber transition-colors"
+            >
+              Submit request →
+            </button>
+          </form>
+        )}
+
+        <a
+          href="/signin"
+          className="inline-block mt-8 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground/60 hover:text-foreground transition-colors"
+        >
+          ← back to sign-in
+        </a>
+      </div>
     </main>
+  );
+}
+
+function Field(props: {
+  label: string;
+  hint?: string;
+  name: string;
+  type: string;
+  required?: boolean;
+  defaultValue?: string;
+}) {
+  return (
+    <label className="block">
+      <div className="flex items-baseline justify-between mb-1.5">
+        <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+          {props.label}
+        </span>
+        {props.hint && (
+          <span className="text-[10px] text-muted-foreground/60 italic">
+            {props.hint}
+          </span>
+        )}
+      </div>
+      <input
+        name={props.name}
+        type={props.type}
+        required={props.required}
+        defaultValue={props.defaultValue}
+        className="w-full bg-card border border-border focus:border-amber focus:ring-0 outline-none px-3 py-2.5 text-sm font-mono transition-colors"
+      />
+    </label>
+  );
+}
+
+function Textarea(props: {
+  label: string;
+  hint?: string;
+  name: string;
+  rows: number;
+  placeholder?: string;
+}) {
+  return (
+    <label className="block">
+      <div className="flex items-baseline justify-between mb-1.5">
+        <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+          {props.label}
+        </span>
+        {props.hint && (
+          <span className="text-[10px] text-muted-foreground/60 italic">
+            {props.hint}
+          </span>
+        )}
+      </div>
+      <textarea
+        name={props.name}
+        rows={props.rows}
+        placeholder={props.placeholder}
+        className="w-full bg-card border border-border focus:border-amber focus:ring-0 outline-none px-3 py-2.5 text-sm font-mono leading-relaxed transition-colors resize-none"
+      />
+    </label>
   );
 }
