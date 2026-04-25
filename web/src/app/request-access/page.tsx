@@ -60,22 +60,22 @@ export default async function RequestAccessPage({
     return (
       <main className="min-h-screen flex items-center justify-center px-6 py-20">
         <div className="w-full max-w-md text-center">
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-teal mb-4">
-            ✓ filed
+          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-phosphor mb-4 glow">
+            [ ✓ request_logged ]
           </div>
-          <h1 className="font-bricolage text-3xl tracking-[-0.025em] mb-4">
-            Your request has been logged.
+          <h1 className="font-mono text-3xl font-bold uppercase tracking-tight mb-4 glow">
+            QUEUED
           </h1>
-          <p className="text-sm text-muted-foreground leading-relaxed mb-8">
-            Max will review and notify you out-of-band. Once approved, return
-            here and sign in with{" "}
-            <span className="font-mono text-foreground">{email}</span>.
+          <p className="text-sm text-phosphor-dim leading-relaxed mb-8 font-mono">
+            &gt; admin will review and notify you out-of-band.<br />
+            &gt; once approved, return and sign in with{" "}
+            <span className="text-phosphor">{email}</span>.
           </p>
           <a
             href="/signin"
-            className="inline-block font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground hover:text-foreground transition-colors border-b border-border/60 hover:border-foreground pb-1"
+            className="inline-block font-mono text-[10px] uppercase tracking-[0.25em] text-phosphor-dim hover:text-phosphor transition-colors border-b border-phosphor/40 hover:border-phosphor pb-1"
           >
-            ← back to sign-in
+            &lt;&lt; back_to_signin
           </a>
         </div>
       </main>
@@ -87,71 +87,69 @@ export default async function RequestAccessPage({
   return (
     <main className="min-h-screen flex items-center justify-center px-6 py-20">
       <div className="w-full max-w-md">
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-amber mb-4">
-          ◐ access · denied (pending review)
+        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-warn mb-4">
+          [ access // denied — pending review ]
         </div>
-        <h1 className="font-bricolage text-3xl tracking-[-0.025em] leading-tight mb-3">
-          Request access to vigil.
+        <h1 className="font-mono text-3xl font-bold uppercase tracking-tight leading-tight mb-3 glow">
+          REQUEST_ACCESS<span className="animate-cursor"></span>
         </h1>
-        <p className="text-sm text-muted-foreground leading-relaxed mb-8">
+        <p className="text-sm text-phosphor-dim leading-relaxed mb-8 font-mono">
           {email ? (
             <>
-              <span className="font-mono text-foreground">{email}</span>{" "}
-              isn&apos;t on the access list. Submit a request and Max will
-              review it.
+              &gt; <span className="text-phosphor">{email}</span> not in
+              allowlist. submit request below for admin review.
             </>
           ) : (
-            "Tell Max who you are so he can grant access."
+            "> identify yourself for admin review."
           )}
         </p>
 
         {pending ? (
-          <div className="border border-border/60 bg-card/50 p-5 text-sm leading-relaxed">
-            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-amber mb-2">
-              already in queue
+          <div className="border border-phosphor/40 bg-card p-5 text-sm leading-relaxed font-mono">
+            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-phosphor mb-2">
+              [ already_in_queue ]
             </div>
-            You have a pending request for{" "}
-            <span className="font-mono text-foreground">{email}</span>. Sit
-            tight — Max will reach out.
+            &gt; pending request exists for{" "}
+            <span className="text-phosphor">{email}</span>. await admin.
           </div>
         ) : (
           <form action={submit} className="space-y-5">
             <Field
-              label="Email"
-              hint="Google account you want access for"
+              label="email"
+              hint="// google account"
               name="email"
               type="email"
               required
               defaultValue={email}
             />
             <Field
-              label="Name"
-              hint="Optional — what should Max call you?"
+              label="name"
+              hint="// optional"
               name="name"
               type="text"
               defaultValue={name}
             />
             <Textarea
-              label="Reason"
-              hint="One line is plenty"
+              label="reason"
+              hint="// one line is plenty"
               name="reason"
               rows={3}
-              placeholder="e.g. I need the printer-room footage from Tuesday."
+              placeholder="> printer-room footage from tuesday."
             />
             <button
               type="submit"
-              className="w-full bg-foreground text-background font-mono uppercase tracking-[0.2em] text-xs py-3.5 hover:bg-amber transition-colors"
+              className="w-full bg-phosphor text-background font-mono uppercase tracking-[0.2em] text-xs py-3.5 hover:bg-background hover:text-phosphor border border-phosphor transition-colors font-bold"
             >
-              Submit request →
+              &gt; submit_request
             </button>
           </form>
         )}
 
         <a
           href="/signin"
-          className="inline-block mt-8 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground/60 hover:text-foreground transition-colors"
+          className="inline-block mt-8 font-mono text-[10px] uppercase tracking-[0.25em] text-phosphor-dim/70 hover:text-phosphor transition-colors"
         >
-          ← back to sign-in
+          &lt;&lt; back_to_signin
         </a>
       </div>
     </main>
@@ -169,11 +167,11 @@ function Field(props: {
   return (
     <label className="block">
       <div className="flex items-baseline justify-between mb-1.5">
-        <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+        <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-phosphor">
           {props.label}
         </span>
         {props.hint && (
-          <span className="text-[10px] text-muted-foreground/60 italic">
+          <span className="text-[10px] text-phosphor-dim/70 font-mono">
             {props.hint}
           </span>
         )}
@@ -183,7 +181,7 @@ function Field(props: {
         type={props.type}
         required={props.required}
         defaultValue={props.defaultValue}
-        className="w-full bg-card border border-border focus:border-amber focus:ring-0 outline-none px-3 py-2.5 text-sm font-mono transition-colors"
+        className="w-full bg-card border border-phosphor/40 focus:border-phosphor focus:ring-0 outline-none px-3 py-2.5 text-sm font-mono text-phosphor transition-colors"
       />
     </label>
   );
@@ -199,11 +197,11 @@ function Textarea(props: {
   return (
     <label className="block">
       <div className="flex items-baseline justify-between mb-1.5">
-        <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+        <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-phosphor">
           {props.label}
         </span>
         {props.hint && (
-          <span className="text-[10px] text-muted-foreground/60 italic">
+          <span className="text-[10px] text-phosphor-dim/70 font-mono">
             {props.hint}
           </span>
         )}
@@ -212,7 +210,7 @@ function Textarea(props: {
         name={props.name}
         rows={props.rows}
         placeholder={props.placeholder}
-        className="w-full bg-card border border-border focus:border-amber focus:ring-0 outline-none px-3 py-2.5 text-sm font-mono leading-relaxed transition-colors resize-none"
+        className="w-full bg-card border border-phosphor/40 focus:border-phosphor focus:ring-0 outline-none px-3 py-2.5 text-sm font-mono text-phosphor leading-relaxed transition-colors resize-none"
       />
     </label>
   );

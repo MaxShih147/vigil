@@ -12,35 +12,33 @@ export default async function HomePage() {
   const now = new Date();
   const utcStamp =
     now.toISOString().slice(0, 10) +
-    " · " +
+    "T" +
     now.toISOString().slice(11, 19) +
-    " UTC";
+    "Z";
 
   return (
     <main className="container mx-auto max-w-6xl px-6 md:px-10 pt-10 pb-20">
       {/* Hero */}
       <header className="mb-16 relative">
-        <div className="font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground/70 mb-4">
-          Dept 01 · The Vigil Record
+        <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-phosphor-dim mb-4">
+          [ archive_node // 01 ]
         </div>
-        <h1 className="font-bricolage text-6xl md:text-8xl font-semibold tracking-[-0.04em] leading-[0.95] mb-4">
-          Edge recordings,
-          <br />
-          <span className="text-amber italic">indexed by hour.</span>
+        <h1 className="font-mono text-5xl md:text-7xl font-bold tracking-[-0.04em] leading-[0.95] mb-4 glow uppercase">
+          THE_RECORD<span className="animate-cursor"></span>
         </h1>
-        <p className="text-muted-foreground max-w-xl text-base leading-relaxed mt-6">
-          Footage from your devices is uploaded continuously and archived in
-          chronological order. Preview or download any segment.
+        <p className="text-phosphor-dim max-w-xl text-sm leading-relaxed mt-6 font-mono">
+          &gt; edge nodes are recording. footage uploads continuously and indexes
+          here in chronological order. select an entry to preview.
         </p>
       </header>
 
       {/* Status strip */}
-      <div className="mb-12 border-y border-border/60 py-4">
+      <div className="mb-12 border-y border-phosphor/30 py-4">
         <dl className="grid grid-cols-2 md:grid-cols-4 gap-y-3 gap-x-8 font-mono text-xs">
-          <Stat label="recordings" value={String(recordings.length)} accent />
-          <Stat label="devices online" value={String(deviceCount)} />
-          <Stat label="total indexed" value={`${totalGB} gb`} />
-          <Stat label="now" value={utcStamp} mono />
+          <Stat label="files_indexed" value={String(recordings.length)} accent />
+          <Stat label="nodes_seen" value={String(deviceCount)} />
+          <Stat label="bytes_stored" value={`${totalGB}_gb`} />
+          <Stat label="utc_clock" value={utcStamp} mono />
         </dl>
       </div>
 
@@ -62,15 +60,14 @@ function Stat({
 }) {
   return (
     <div>
-      <dt className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground/60 mb-1">
+      <dt className="text-[10px] uppercase tracking-[0.22em] text-phosphor-dim/70 mb-1">
         {label}
       </dt>
       <dd
         className={[
-          "tabular-nums",
-          mono ? "text-xs" : "text-2xl",
-          mono ? "" : "font-bricolage",
-          accent ? "text-amber" : "",
+          "tabular-nums font-mono",
+          mono ? "text-xs" : "text-2xl font-bold",
+          accent ? "text-phosphor glow" : "text-phosphor",
         ].join(" ")}
       >
         {value}

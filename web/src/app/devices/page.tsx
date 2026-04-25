@@ -8,8 +8,8 @@ export const dynamic = "force-dynamic";
 type DeviceRow = typeof devices.$inferSelect;
 type CommandRow = typeof deviceCommands.$inferSelect;
 
-const ONLINE_THRESHOLD_MS = 30_000;     // < 30s since last heartbeat = online
-const STALE_THRESHOLD_MS = 5 * 60_000;  // < 5min = stale, otherwise offline
+const ONLINE_THRESHOLD_MS = 30_000;
+const STALE_THRESHOLD_MS = 5 * 60_000;
 
 function status(d: DeviceRow): "online" | "stale" | "offline" {
   if (!d.lastSeen) return "offline";
@@ -23,10 +23,10 @@ function relTime(d: Date | string | null): string {
   if (!d) return "never";
   const t = new Date(d).getTime();
   const diff = Math.max(0, Date.now() - t);
-  if (diff < 60_000) return `${Math.round(diff / 1000)}s ago`;
-  if (diff < 3_600_000) return `${Math.round(diff / 60_000)}m ago`;
-  if (diff < 86_400_000) return `${Math.round(diff / 3_600_000)}h ago`;
-  return `${Math.round(diff / 86_400_000)}d ago`;
+  if (diff < 60_000) return `${Math.round(diff / 1000)}s_ago`;
+  if (diff < 3_600_000) return `${Math.round(diff / 60_000)}m_ago`;
+  if (diff < 86_400_000) return `${Math.round(diff / 3_600_000)}h_ago`;
+  return `${Math.round(diff / 86_400_000)}d_ago`;
 }
 
 export default async function DevicesPage() {
@@ -49,15 +49,15 @@ export default async function DevicesPage() {
   return (
     <main className="container mx-auto max-w-6xl px-6 md:px-10 pt-10 pb-20">
       <header className="mb-12 relative">
-        <div className="font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground/70 mb-3">
-          Dept 03 · Device Roster
+        <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-phosphor-dim mb-3">
+          [ control_node // 03 ]
         </div>
-        <h1 className="font-bricolage text-5xl md:text-6xl font-semibold tracking-[-0.04em] leading-[0.95]">
-          Eyes in the field.
+        <h1 className="font-mono text-4xl md:text-6xl font-bold tracking-[-0.04em] leading-[0.95] uppercase glow">
+          NODES<span className="animate-cursor"></span>
         </h1>
-        <p className="text-muted-foreground max-w-xl text-sm leading-relaxed mt-4">
-          Each Pi reports state every {`${10}`}s. Commands queue here, and the
-          device picks them up on its next poll.
+        <p className="text-phosphor-dim max-w-xl text-sm leading-relaxed mt-4 font-mono">
+          &gt; each node reports state every 10s. commands queue here. node
+          picks them up on next poll.
         </p>
       </header>
 
@@ -80,15 +80,16 @@ export default async function DevicesPage() {
 
 function EmptyState() {
   return (
-    <div className="border border-border/60 border-dashed rounded p-16 text-center">
-      <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground/60 mb-4">
-        roster · empty
+    <div className="border border-phosphor/30 border-dashed p-16 text-center">
+      <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-phosphor-dim/70 mb-4">
+        [ roster // empty ]
       </div>
-      <p className="font-bricolage text-2xl mb-3">No devices have phoned home.</p>
-      <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
-        Once you start <code className="font-mono text-xs">vigil-agent</code>{" "}
-        on a Pi (and it can reach this dashboard), it&apos;ll appear here within
-        ~10 seconds.
+      <p className="font-mono text-2xl font-bold uppercase tracking-tight text-phosphor mb-3">
+        NO_NODES_REPORTING
+      </p>
+      <p className="text-sm text-phosphor-dim max-w-md mx-auto leading-relaxed font-mono">
+        &gt; start <span className="text-phosphor">vigil-agent</span> on a node.
+        if it can reach this dashboard, it will appear here within ~10s.
       </p>
     </div>
   );
@@ -102,103 +103,90 @@ function DeviceCard({
   recentCommands: CommandRow[];
 }) {
   const s = status(device);
-  const statusColor = {
-    online: "text-teal",
-    stale: "text-amber",
+  const statusColorClass = {
+    online: "text-phosphor",
+    stale: "text-phosphor-dim",
     offline: "text-warn",
   }[s];
-  const statusLabel = {
-    online: "online",
-    stale: "stale",
-    offline: "offline",
-  }[s];
+  const statusLabel = { online: "online", stale: "stale", offline: "offline" }[s];
   const diskWarning =
     device.diskUsedPct !== null && device.diskUsedPct >= 85;
 
   return (
-    <article className="border border-border/60 bg-card/40 backdrop-blur-sm">
-      {/* Header strip */}
-      <div className="border-b border-border/60 px-6 py-4 flex items-center justify-between flex-wrap gap-3">
+    <article className="border border-phosphor/40 bg-card/40 backdrop-blur-sm">
+      <div className="border-b border-phosphor/30 px-6 py-4 flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-baseline gap-4">
           <span
-            className={`text-base ${statusColor} ${
+            className={`text-base ${statusColorClass} ${
               s === "online" ? "animate-tally" : ""
             }`}
           >
             ●
           </span>
-          <h2 className="font-bricolage text-2xl tracking-tight">
+          <h2 className="font-mono text-xl font-bold tracking-tight uppercase text-phosphor">
             {device.label || device.id}
           </h2>
-          <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground/70">
-            id · {device.id}
+          <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-phosphor-dim/80">
+            id::{device.id}
           </span>
           {device.location && (
-            <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground/70 hidden md:inline">
-              loc · {device.location}
+            <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-phosphor-dim/80 hidden md:inline">
+              loc::{device.location}
             </span>
           )}
         </div>
         <div
-          className={`font-mono text-[10px] uppercase tracking-[0.3em] ${statusColor}`}
+          className={`font-mono text-[10px] uppercase tracking-[0.3em] ${statusColorClass}`}
         >
-          {statusLabel} · {relTime(device.lastSeen)}
+          [{statusLabel}] {relTime(device.lastSeen)}
         </div>
       </div>
 
-      {/* Body grid */}
       <div className="grid md:grid-cols-[1fr_auto] gap-6 p-6">
-        {/* Stats */}
         <dl className="grid grid-cols-2 sm:grid-cols-4 gap-y-4 gap-x-6 font-mono text-xs">
           <Stat
             label="recording"
             value={device.recording ? "ACTIVE" : "idle"}
-            tone={device.recording ? "amber" : "muted"}
+            tone={device.recording ? "phosphor" : "muted"}
           />
           <Stat
-            label="disk used"
+            label="disk_used"
             value={device.diskUsedPct != null ? `${device.diskUsedPct}%` : "—"}
             tone={diskWarning ? "warn" : "default"}
           />
           <Stat
-            label="disk free"
-            value={
-              device.diskFreeGb != null ? `${device.diskFreeGb} GB` : "—"
-            }
+            label="disk_free"
+            value={device.diskFreeGb != null ? `${device.diskFreeGb}_gb` : "—"}
           />
           <Stat
-            label="pending uploads"
+            label="pending_uploads"
             value={
-              device.pendingUploads != null
-                ? String(device.pendingUploads)
-                : "—"
+              device.pendingUploads != null ? String(device.pendingUploads) : "—"
             }
-            tone={(device.pendingUploads ?? 0) > 5 ? "amber" : "default"}
+            tone={(device.pendingUploads ?? 0) > 5 ? "phosphor" : "default"}
           />
-          <Stat label="last upload" value={relTime(device.lastUploadAt)} />
+          <Stat label="last_upload" value={relTime(device.lastUploadAt)} />
           <Stat label="ip" value={device.ip ?? "—"} />
           <Stat label="version" value={device.vigilVersion ?? "—"} />
           <Stat label="registered" value={relTime(device.registeredAt)} />
         </dl>
 
-        {/* Command panel */}
-        <div className="md:border-l md:border-border/60 md:pl-6 min-w-[180px]">
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground/70 mb-3">
-            command queue
+        <div className="md:border-l md:border-phosphor/30 md:pl-6 min-w-[180px]">
+          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-phosphor-dim/80 mb-3">
+            [ command_queue ]
           </div>
-          <CommandButton deviceId={device.id} command="force_upload_now" label="Force upload" tone="primary" />
-          <CommandButton deviceId={device.id} command="start_recording" label="Start recording" />
-          <CommandButton deviceId={device.id} command="stop_recording" label="Stop recording" />
-          <CommandButton deviceId={device.id} command="restart_recorder" label="Restart recorder" tone="muted" />
-          <CommandButton deviceId={device.id} command="restart_uploader" label="Restart uploader" tone="muted" />
+          <CommandButton deviceId={device.id} command="force_upload_now" label="force_upload" tone="primary" />
+          <CommandButton deviceId={device.id} command="start_recording" label="start_record" />
+          <CommandButton deviceId={device.id} command="stop_recording" label="stop_record" />
+          <CommandButton deviceId={device.id} command="restart_recorder" label="restart_recorder" tone="muted" />
+          <CommandButton deviceId={device.id} command="restart_uploader" label="restart_uploader" tone="muted" />
         </div>
       </div>
 
-      {/* Recent command log */}
       {recentCommands.length > 0 && (
-        <div className="border-t border-border/60 px-6 py-4">
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground/70 mb-3">
-            recent commands
+        <div className="border-t border-phosphor/30 px-6 py-4">
+          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-phosphor-dim/80 mb-3">
+            [ recent_log ]
           </div>
           <ul className="space-y-1.5 font-mono text-xs">
             {recentCommands.map((c) => (
@@ -207,11 +195,11 @@ function DeviceCard({
                 className="grid grid-cols-[auto_auto_1fr_auto] gap-3 items-baseline"
               >
                 <CommandStatus status={c.status} />
-                <span className="text-foreground">{c.command}</span>
-                <span className="text-muted-foreground/70 truncate">
+                <span className="text-phosphor">{c.command}</span>
+                <span className="text-phosphor-dim/70 truncate">
                   {(c.result as { message?: string } | null)?.message ?? ""}
                 </span>
-                <span className="text-muted-foreground/60 text-[10px] uppercase tracking-[0.2em]">
+                <span className="text-phosphor-dim/70 text-[10px] uppercase tracking-[0.2em]">
                   {relTime(c.createdAt)}
                 </span>
               </li>
@@ -230,22 +218,22 @@ function Stat({
 }: {
   label: string;
   value: string;
-  tone?: "default" | "amber" | "warn" | "muted";
+  tone?: "default" | "phosphor" | "warn" | "muted";
 }) {
   const colorClass =
-    tone === "amber"
-      ? "text-amber"
+    tone === "phosphor"
+      ? "text-phosphor glow"
       : tone === "warn"
         ? "text-warn"
         : tone === "muted"
-          ? "text-muted-foreground"
-          : "text-foreground";
+          ? "text-phosphor-dim"
+          : "text-phosphor";
   return (
     <div>
-      <dt className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground/60 mb-1">
+      <dt className="text-[10px] uppercase tracking-[0.22em] text-phosphor-dim/70 mb-1">
         {label}
       </dt>
-      <dd className={`tabular-nums ${colorClass}`}>{value}</dd>
+      <dd className={`tabular-nums font-mono ${colorClass}`}>{value}</dd>
     </div>
   );
 }
@@ -263,10 +251,10 @@ function CommandButton({
 }) {
   const cls =
     tone === "primary"
-      ? "bg-foreground text-background hover:bg-amber"
+      ? "bg-phosphor text-background hover:bg-background hover:text-phosphor border border-phosphor font-bold"
       : tone === "muted"
-        ? "border border-border/60 text-muted-foreground hover:text-foreground hover:border-foreground"
-        : "border border-border/60 hover:border-foreground";
+        ? "border border-phosphor/30 text-phosphor-dim hover:text-phosphor hover:border-phosphor"
+        : "border border-phosphor/40 text-phosphor hover:bg-phosphor/10";
   return (
     <form
       action={async () => {
@@ -278,7 +266,7 @@ function CommandButton({
         type="submit"
         className={`block w-full font-mono text-[10px] uppercase tracking-[0.22em] py-2 px-3 mb-2 transition-colors ${cls}`}
       >
-        → {label}
+        &gt; {label}
       </button>
     </form>
   );
@@ -286,12 +274,12 @@ function CommandButton({
 
 function CommandStatus({ status }: { status: string }) {
   const map: Record<string, { dot: string; class: string }> = {
-    pending: { dot: "○", class: "text-muted-foreground/60" },
-    sent: { dot: "◐", class: "text-amber" },
-    done: { dot: "●", class: "text-teal" },
+    pending: { dot: "○", class: "text-phosphor-dim/70" },
+    sent: { dot: "◐", class: "text-phosphor-dim" },
+    done: { dot: "●", class: "text-phosphor glow" },
     failed: { dot: "●", class: "text-warn" },
   };
-  const v = map[status] ?? { dot: "?", class: "text-muted-foreground" };
+  const v = map[status] ?? { dot: "?", class: "text-phosphor-dim" };
   return (
     <span className={`text-xs uppercase tracking-[0.22em] ${v.class}`}>
       {v.dot} {status}

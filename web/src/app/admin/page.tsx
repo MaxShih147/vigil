@@ -24,53 +24,46 @@ export default async function AdminPage() {
 
   return (
     <main className="container mx-auto max-w-4xl px-6 md:px-10 pt-10 pb-20">
-      {/* Hero */}
       <header className="mb-12 relative">
-        <div className="font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground/70 mb-3">
-          Dept 02 · Access Control
+        <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-phosphor-dim mb-3">
+          [ control_node // 02 ]
         </div>
-        <h1 className="font-bricolage text-5xl md:text-6xl font-semibold tracking-[-0.04em] leading-[0.95]">
-          The roster.
+        <h1 className="font-mono text-4xl md:text-6xl font-bold tracking-[-0.04em] leading-[0.95] uppercase glow">
+          ROSTER<span className="animate-cursor"></span>
         </h1>
-        <p className="text-muted-foreground max-w-xl text-sm leading-relaxed mt-4">
-          Approve or revoke access. Approvals take effect on the user&apos;s
+        <p className="text-phosphor-dim max-w-xl text-sm leading-relaxed mt-4 font-mono">
+          &gt; approve or revoke access. changes take effect on the user&apos;s
           next sign-in attempt.
         </p>
       </header>
 
-      {/* Pending */}
       <section className="mb-16">
-        <SectionHeader
-          number="01"
-          title="Pending requests"
-          count={pending.length}
-          accent="amber"
-        />
+        <SectionHeader number="01" title="pending_requests" count={pending.length} />
 
         {pending.length === 0 ? (
-          <Empty text="No pending requests." />
+          <Empty text="// no pending requests" />
         ) : (
-          <ul className="border-y border-border/60 divide-y divide-border/40">
+          <ul className="border-y border-phosphor/30 divide-y divide-phosphor/15">
             {pending.map((req) => (
               <li key={req.id} className="py-5 grid md:grid-cols-[1fr_auto] gap-4 items-start">
                 <div className="min-w-0">
                   <div className="flex items-baseline gap-3 mb-1">
-                    <span className="font-bricolage text-lg font-medium tracking-tight truncate">
+                    <span className="font-mono text-lg font-bold tracking-tight truncate text-phosphor">
                       {req.name || req.email}
                     </span>
                     {req.name && (
-                      <span className="font-mono text-xs text-muted-foreground truncate">
-                        {req.email}
+                      <span className="font-mono text-xs text-phosphor-dim truncate">
+                        &lt;{req.email}&gt;
                       </span>
                     )}
                   </div>
                   {req.reason && (
-                    <p className="text-sm text-muted-foreground italic leading-relaxed mt-2 max-w-2xl">
-                      &ldquo;{req.reason}&rdquo;
+                    <p className="text-sm text-phosphor-dim leading-relaxed mt-2 max-w-2xl font-mono">
+                      &gt; {req.reason}
                     </p>
                   )}
-                  <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground/60 mt-2">
-                    {new Date(req.requestedAt).toLocaleString()}
+                  <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-phosphor-dim/70 mt-2">
+                    [{new Date(req.requestedAt).toLocaleString()}]
                   </div>
                 </div>
                 <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.22em]">
@@ -82,9 +75,9 @@ export default async function AdminPage() {
                   >
                     <button
                       type="submit"
-                      className="bg-foreground text-background px-4 py-2 hover:bg-teal transition-colors"
+                      className="bg-phosphor text-background px-4 py-2 hover:bg-background hover:text-phosphor border border-phosphor transition-colors font-bold"
                     >
-                      ✓ Approve
+                      [+] approve
                     </button>
                   </form>
                   <form
@@ -95,9 +88,9 @@ export default async function AdminPage() {
                   >
                     <button
                       type="submit"
-                      className="text-muted-foreground hover:text-warn transition-colors px-2 py-2"
+                      className="text-phosphor-dim hover:text-warn transition-colors px-2 py-2"
                     >
-                      ✗ Deny
+                      [x] deny
                     </button>
                   </form>
                 </div>
@@ -107,35 +100,29 @@ export default async function AdminPage() {
         )}
       </section>
 
-      {/* Allowed */}
       <section>
-        <SectionHeader
-          number="02"
-          title="Allowed emails"
-          count={allowed.length}
-          accent="teal"
-        />
+        <SectionHeader number="02" title="allowed_emails" count={allowed.length} />
 
         {allowed.length === 0 ? (
-          <Empty text="Nobody approved yet (admin emails are auto-allowed via env var)." />
+          <Empty text="// nobody approved yet (admins auto-allowed via env var)" />
         ) : (
-          <ul className="border-y border-border/60 divide-y divide-border/40">
+          <ul className="border-y border-phosphor/30 divide-y divide-phosphor/15">
             {allowed.map((row) => (
               <li
                 key={row.email}
                 className="py-3 flex items-center justify-between gap-3"
               >
                 <div className="min-w-0 flex items-center gap-3">
-                  <span className="text-teal text-xs">●</span>
-                  <span className="font-mono text-sm truncate">
+                  <span className="text-phosphor text-xs">●</span>
+                  <span className="font-mono text-sm truncate text-phosphor">
                     {row.email}
                   </span>
                 </div>
-                <div className="flex items-center gap-4 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground/70">
+                <div className="flex items-center gap-4 font-mono text-[10px] uppercase tracking-[0.22em] text-phosphor-dim/70">
                   <span className="hidden sm:inline">
-                    added {new Date(row.addedAt).toLocaleDateString()}
+                    [+{new Date(row.addedAt).toLocaleDateString()}]
                     {row.addedBy &&
-                      `  · by ${row.addedBy.split("@")[0]}`}
+                      ` by ${row.addedBy.split("@")[0]}`}
                   </span>
                   <form
                     action={async () => {
@@ -145,9 +132,9 @@ export default async function AdminPage() {
                   >
                     <button
                       type="submit"
-                      className="text-muted-foreground/60 hover:text-warn transition-colors"
+                      className="text-phosphor-dim/70 hover:text-warn transition-colors"
                     >
-                      Revoke
+                      [revoke]
                     </button>
                   </form>
                 </div>
@@ -164,26 +151,22 @@ function SectionHeader({
   number,
   title,
   count,
-  accent,
 }: {
   number: string;
   title: string;
   count: number;
-  accent: "amber" | "teal";
 }) {
   return (
-    <div className="flex items-baseline justify-between border-b border-border/60 pb-2 mb-1">
+    <div className="flex items-baseline justify-between border-b border-phosphor/30 pb-2 mb-1">
       <div className="flex items-baseline gap-4">
-        <span
-          className={`font-mono text-[10px] uppercase tracking-[0.3em] ${
-            accent === "amber" ? "text-amber" : "text-teal"
-          }`}
-        >
-          §{number}
+        <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-phosphor">
+          [§{number}]
         </span>
-        <h2 className="font-bricolage text-2xl tracking-tight">{title}</h2>
+        <h2 className="font-mono text-xl uppercase tracking-tight text-phosphor">
+          {title}
+        </h2>
       </div>
-      <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground/70">
+      <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-phosphor-dim/70">
         {count} {count === 1 ? "entry" : "entries"}
       </span>
     </div>
@@ -192,6 +175,6 @@ function SectionHeader({
 
 function Empty({ text }: { text: string }) {
   return (
-    <p className="text-sm text-muted-foreground/70 italic py-8 px-1">{text}</p>
+    <p className="text-sm text-phosphor-dim/70 py-8 px-1 font-mono">{text}</p>
   );
 }

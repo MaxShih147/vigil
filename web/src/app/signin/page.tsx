@@ -7,26 +7,26 @@ export default function SignInPage() {
         <div className="w-full max-w-sm">
           {/* Top mark */}
           <div className="flex items-baseline gap-3 mb-12 justify-center">
-            <span className="text-amber inline-block w-2 h-2 rounded-full animate-tally translate-y-[-4px]" />
-            <span className="font-bricolage font-semibold tracking-[0.22em] text-sm">
-              VIGIL
+            <span className="text-phosphor inline-block w-2 h-2 animate-tally translate-y-[-4px]" />
+            <span className="font-mono font-bold tracking-[0.22em] text-sm glow">
+              VIGIL_SYS
             </span>
-            <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground/60">
-              terminal
+            <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-phosphor-dim">
+              // tty.0
             </span>
           </div>
 
           {/* Hero */}
           <div className="mb-10 text-center">
-            <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground/70 mb-3">
-              authorized access only
+            <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-phosphor-dim mb-3">
+              [ authorized_access_only ]
             </div>
-            <h1 className="font-bricolage text-4xl font-semibold tracking-[-0.025em] leading-tight mb-3">
-              Sign in to access
-              <br />
-              <span className="italic text-amber">live & archived</span>{" "}
-              footage.
+            <h1 className="font-mono text-3xl font-bold tracking-[-0.025em] leading-tight mb-3 uppercase glow">
+              ACCESS<span className="animate-cursor"></span>
             </h1>
+            <p className="font-mono text-xs text-phosphor-dim mt-4">
+              &gt; auth via google. allowlist enforced.
+            </p>
           </div>
 
           {/* CTA */}
@@ -39,26 +39,25 @@ export default function SignInPage() {
           >
             <button
               type="submit"
-              className="group w-full flex items-center justify-center gap-3 bg-foreground text-background font-mono uppercase tracking-[0.2em] text-xs py-4 px-6 hover:bg-amber hover:text-background transition-colors"
+              className="group w-full flex items-center justify-center gap-3 bg-phosphor text-background font-mono uppercase tracking-[0.2em] text-xs py-4 px-6 hover:bg-background hover:text-phosphor border border-phosphor transition-colors font-bold"
             >
               <GoogleMark />
-              <span>Continue with Google</span>
+              <span>&gt; auth_with_google</span>
             </button>
 
-            <p className="text-[11px] text-muted-foreground text-center leading-relaxed pt-4 border-t border-border/40">
-              New here? Sign in with the Google account you want access for. If
-              you&apos;re not on the access list, you&apos;ll be guided to
+            <p className="text-[11px] font-mono text-phosphor-dim text-center leading-relaxed pt-4 border-t border-phosphor/20">
+              &gt; new here? sign in with the google account you want access for.
+              if you&apos;re not on the allowlist, you&apos;ll be guided to
               request it.
             </p>
           </form>
         </div>
       </div>
 
-      {/* Bottom marquee */}
-      <div className="border-t border-border/40 overflow-hidden">
-        <div className="container mx-auto max-w-6xl px-6 py-3 flex justify-between font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground/60">
-          <span>vigil · 2026</span>
-          <span className="hidden sm:inline">request — review — record</span>
+      <div className="border-t border-phosphor/20 overflow-hidden">
+        <div className="container mx-auto max-w-6xl px-6 py-3 flex justify-between font-mono text-[10px] uppercase tracking-[0.3em] text-phosphor-dim/60">
+          <span>vigil_sys @ 2026</span>
+          <span className="hidden sm:inline">// request -- review -- record //</span>
         </div>
       </div>
     </main>
