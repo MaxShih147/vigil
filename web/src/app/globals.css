@@ -182,12 +182,9 @@
     animation: pulse-tally 2.4s ease-in-out infinite;
   }
 
-  /* Terminal cursor — static (no blink, easier on the eyes) */
+  /* Cursor utility kept as a no-op so existing markup compiles cleanly */
   .animate-cursor::after {
-    content: "_";
-    display: inline-block;
-    margin-left: 0.1em;
-    color: var(--phosphor);
+    content: none;
   }
 
   /* Italic now disallowed in this aesthetic — neutralize */
