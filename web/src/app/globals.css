@@ -182,10 +182,6 @@
     animation: pulse-tally 2.4s ease-in-out infinite;
   }
 
-  /* Cursor utility kept as a no-op so existing markup compiles cleanly */
-  .animate-cursor::after {
-    content: none;
-  }
 
   /* Italic now disallowed in this aesthetic — neutralize */
   .italic {

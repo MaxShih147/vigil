@@ -24,7 +24,7 @@ export default async function HomePage() {
           [ archive_node // 01 ]
         </div>
         <h1 className="font-mono text-5xl md:text-7xl font-bold tracking-[-0.04em] leading-[0.95] mb-4 glow uppercase">
-          THE_RECORD<span className="animate-cursor"></span>
+          THE_RECORD
         </h1>
         <p className="text-phosphor-dim max-w-xl text-sm leading-relaxed mt-6 font-mono">
           &gt; edge nodes are recording. footage uploads continuously and indexes

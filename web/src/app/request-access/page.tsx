@@ -91,7 +91,7 @@ export default async function RequestAccessPage({
           [ access // denied — pending review ]
         </div>
         <h1 className="font-mono text-3xl font-bold uppercase tracking-tight leading-tight mb-3 glow">
-          REQUEST_ACCESS<span className="animate-cursor"></span>
+          REQUEST_ACCESS
         </h1>
         <p className="text-sm text-phosphor-dim leading-relaxed mb-8 font-mono">
           {email ? (

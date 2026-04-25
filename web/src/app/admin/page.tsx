@@ -29,7 +29,7 @@ export default async function AdminPage() {
           [ control_node // 02 ]
         </div>
         <h1 className="font-mono text-4xl md:text-6xl font-bold tracking-[-0.04em] leading-[0.95] uppercase glow">
-          ROSTER<span className="animate-cursor"></span>
+          ROSTER
         </h1>
         <p className="text-phosphor-dim max-w-xl text-sm leading-relaxed mt-4 font-mono">
           &gt; approve or revoke access. changes take effect on the user&apos;s

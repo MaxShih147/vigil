@@ -53,7 +53,7 @@ export default async function DevicesPage() {
           [ control_node // 03 ]
         </div>
         <h1 className="font-mono text-4xl md:text-6xl font-bold tracking-[-0.04em] leading-[0.95] uppercase glow">
-          NODES<span className="animate-cursor"></span>
+          NODES
         </h1>
         <p className="text-phosphor-dim max-w-xl text-sm leading-relaxed mt-4 font-mono">
           &gt; each node reports state every 10s. commands queue here. node

@@ -22,7 +22,7 @@ export default function SignInPage() {
               [ authorized_access_only ]
             </div>
             <h1 className="font-mono text-3xl font-bold tracking-[-0.025em] leading-tight mb-3 uppercase glow">
-              ACCESS<span className="animate-cursor"></span>
+              ACCESS
             </h1>
             <p className="font-mono text-xs text-phosphor-dim mt-4">
               &gt; auth via google. allowlist enforced.
