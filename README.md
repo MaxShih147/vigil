@@ -28,7 +28,7 @@ docs/    Product direction and design notes
 
 ## Phases
 
-Recording and delivery — shipped:
+**Platform** — recording and delivery, shipped:
 
 | # | Goal | State |
 | --- | --- | --- |
@@ -38,19 +38,23 @@ Recording and delivery — shipped:
 | 4 | Heartbeat / device agent + command channel | ✅ |
 | 5 | Web dashboard (`web/`) — Google OAuth, allowlist, device control | ✅ |
 
-Inspection — next, and the reason the rest exists. The box stops being a
+**Inspection** — next, and the reason the rest exists. The box stops being a
 camera that uploads and becomes a box that *judges whether the machine's
 work is going right*, with the anchor use case being MSLA/resin 3D printing.
 See **[docs/PRODUCT.md](docs/PRODUCT.md)** for the full plan — optical
 constraints, detection ladder, system architecture, data model, and phases.
 
+Numbering below matches `docs/PRODUCT.md` §7 and is a separate track from
+the platform phases above.
+
 | # | Goal | State |
 | --- | --- | --- |
 | 0 | Optical feasibility — can a camera even see a resin print fail? | ⏳ |
-| 6 | Cycle lock: find the layer rhythm from video alone | ⏳ |
-| 7 | Detachment detection + event pipeline | ⏳ |
-| 8 | Kiosk screen at the machine + notifications | ⏳ |
-| 9 | Cloud judgement on flagged frames | ⏳ |
+| 1 | Camera tee + cycle lock: find the layer rhythm from video alone | ⏳ |
+| 2 | Detachment detection + event pipeline | ⏳ |
+| 3 | Kiosk screen at the machine + notifications | ⏳ |
+| 4 | Cloud judgement on flagged frames | ⏳ |
+| 5 | Slice-file comparison + auto-abort | ⏳ |
 
 ---
 
@@ -119,5 +123,5 @@ The repo is intended to be deployed to `/opt/vigil/` on the Pi (i.e.
 # on the Pi, after cloning to /opt/vigil and creating the venv:
 sudo cp pi/systemd/vigil-recorder.service /etc/systemd/system/
 sudo cp pi/systemd/vigil-uploader.service /etc/systemd/system/
-sudo systemctl enable --now vigil-recorder vigil-uploader
+sudo systemctl enable --now vigil-recorder vigil-uploader vigil-agent
 ```

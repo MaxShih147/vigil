@@ -15,7 +15,7 @@ camera:
 recording:
   segment_seconds: 600        # 10 minutes per file
   format: mp4
-  codec: libx264              # change to h264_v4l2m2m on Pi for hardware encode
+  codec: libx264              # Pi 4 had h264_v4l2m2m; Pi 5 has no HW H.264 encoder
   preset: veryfast
   output_dir: ./data/recordings
   filename_pattern: "vigil_%Y-%m-%d_%H-%M-%S.mp4"
