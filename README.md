@@ -1,41 +1,60 @@
 # vigil
 
 Raspberry Pi 5 + USB webcam edge recorder, with cloud storage and a
-Vercel-hosted dashboard.
+Vercel-hosted dashboard — on its way to becoming a box you put next to a
+machine to watch whether its work is going right.
 
 > 插電即開機、開機即錄影、錄影即切檔、切檔即上傳。
 
-## Stakeholders
+## Roles
 
-| Role | Who | Where |
+| Role | Responsibility | Typically located |
 | --- | --- | --- |
-| Operator (deploys & runs the device) | Yvonne | 新竹 |
-| Consumer (pulls footage) | Fred | 台北 |
-| Maintainer | Max | 台北 |
+| **Operator** | Installs the box at the machine, powers it, keeps the camera aimed | On the shop floor, at the site |
+| **Consumer** | Pulls footage and reads status; does not touch the device | Any office, any city |
+| **Maintainer** | Owns the code, the cloud account, and the fleet | Anywhere with a laptop |
 
-Three people in three cities → footage must live in the cloud, not on a
-NAS that requires VPN/port-forwarding to reach.
+The three roles are rarely in the same building → footage and status must
+live in the cloud, not on a NAS that requires VPN/port-forwarding to reach.
+Nothing in the system assumes anyone can walk over and look at the device.
 
 ## Layout
 
 ```
 pi/      Edge code that runs on the Raspberry Pi (and on Mac for dev)
-web/     Next.js dashboard hosted on Vercel (next phase)
+web/     Next.js dashboard hosted on Vercel
+docs/    Product direction and design notes
 ```
 
 ## Phases
+
+Recording and delivery — shipped:
 
 | # | Goal | State |
 | --- | --- | --- |
 | 1 | Single-host webcam recording | ✅ |
 | 2 | Auto segmentation (10-min mp4) | ✅ |
-| 3 | Auto upload to Cloudflare R2 | ✅ code, ⏳ needs R2 creds |
-| 4 | Heartbeat / device agent | ⏳ |
-| 5 | Web dashboard (`web/`) | ⏳ |
+| 3 | Auto upload to Cloudflare R2 | ✅ |
+| 4 | Heartbeat / device agent + command channel | ✅ |
+| 5 | Web dashboard (`web/`) — Google OAuth, allowlist, device control | ✅ |
+
+Inspection — next, and the reason the rest exists. The box stops being a
+camera that uploads and becomes a box that *judges whether the machine's
+work is going right*, with the anchor use case being MSLA/resin 3D printing.
+See **[docs/PRODUCT.md](docs/PRODUCT.md)** for the full plan — optical
+constraints, detection ladder, system architecture, data model, and phases.
+
+| # | Goal | State |
+| --- | --- | --- |
+| 0 | Optical feasibility — can a camera even see a resin print fail? | ⏳ |
+| 6 | Cycle lock: find the layer rhythm from video alone | ⏳ |
+| 7 | Detachment detection + event pipeline | ⏳ |
+| 8 | Kiosk screen at the machine + notifications | ⏳ |
+| 9 | Cloud judgement on flagged frames | ⏳ |
 
 ---
 
-## Cloudflare R2 setup (one-time, by Max)
+## Cloudflare R2 setup (one-time, by the Maintainer)
 
 1. https://dash.cloudflare.com → **R2 Object Storage** → enable (requires
    payment method; storage is $0.015/GB/month, egress is **free**).

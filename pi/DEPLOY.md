@@ -1,7 +1,7 @@
 # Pi deployment runbook
 
 End-to-end flow for taking a Raspberry Pi 5 from box to a vigil node on the
-dashboard. Battle-tested on `vigil-dev-01` (Taipei dev, 2026-05-08).
+dashboard. Battle-tested on `vigil-dev-01` (2026-05-08).
 
 > Production install at `/opt/vigil/` with a dedicated `vigil` user is a
 > separate hardening pass. This runbook gets you to a working dev/pilot Pi
@@ -25,7 +25,7 @@ pick **Raspberry Pi OS Lite (64-bit)**, then click the gear icon and fill in:
 | Field | Value |
 | --- | --- |
 | Hostname | `vigil-<location>-<NN>` (e.g. `vigil-dev-01`, `vigil-hsinchu-01`) — this becomes `device.id` and the R2 key prefix |
-| Username | `max` (avoid the default `pi` — it's the first thing scanners try) |
+| Username | `vigilop` (avoid the default `pi` — it's the first thing scanners try) |
 | Password | something memorable; you'll only need it once |
 | Wi-Fi SSID / pass | see Step 2 |
 | Wi-Fi country | `TW` |
@@ -36,7 +36,7 @@ Generate a per-Pi SSH key on the Mac so you can revoke it without nuking
 your GitHub keys:
 
 ```bash
-ssh-keygen -t ed25519 -f ~/.ssh/vigil-<hostname> -N "" -C "max@mac → vigil-<hostname>"
+ssh-keygen -t ed25519 -f ~/.ssh/vigil-<hostname> -N "" -C "maintainer-laptop → vigil-<hostname>"
 ```
 
 ## Step 2 — Wi-Fi for first boot
@@ -70,7 +70,7 @@ LED reading:
 From the Mac (must be on the same network as the Pi):
 
 ```bash
-ssh max@<hostname>.local
+ssh vigilop@<hostname>.local
 ```
 
 If `.local` doesn't resolve, ARP-scan the subnet and look for OUI
@@ -92,15 +92,15 @@ sudo tailscale up --ssh
 ```
 
 The second command prints a `https://login.tailscale.com/a/...` URL. Open
-it on the Mac, log in with your tailnet account (vigil's tailnet is on
-`bigweiweig@gmail.com`), and approve the device.
+it on the Mac, log in with the tailnet account that owns the vigil fleet
+(the Maintainer's Tailscale account), and approve the device.
 
 On the Mac side, add the Pi to `~/.ssh/config`:
 
 ```
 Host vigil-<hostname>
   HostName vigil-<hostname>
-  User max
+  User vigilop
   IdentityFile ~/.ssh/vigil-<hostname>
   IdentitiesOnly yes
 ```
@@ -144,12 +144,12 @@ Tailscale + SSH key auth — both layers must be passed before you reach
 this user.
 
 ```bash
-echo 'max ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/010-max-nopasswd
-sudo chmod 0440 /etc/sudoers.d/010-max-nopasswd
+echo 'vigilop ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/010-vigilop-nopasswd
+sudo chmod 0440 /etc/sudoers.d/010-vigilop-nopasswd
 ```
 
-(For prod Yvonne deploy, leave sudo password-protected and grant only the
-specific systemctl/nmcli verbs you need.)
+(For an Operator-facing production deploy, leave sudo password-protected and
+grant only the specific systemctl/nmcli verbs you need.)
 
 ## Step 7 — Repo + venv
 
