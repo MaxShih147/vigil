@@ -8,6 +8,8 @@ inspection is the next build. Nothing in §6 exists yet.
 correctly?*
 **Audience:** anyone who needs to understand, diagram, or build this system.
 This document is self-contained; it does not assume you have read the code.
+**Start here if you are building:** `DETACHMENT.md` — the first inspection
+task, scoped to one defect.
 
 ---
 
@@ -149,7 +151,7 @@ without the levels above it.
 | **L1** | Is anything still hanging from the plate? (silhouette vs. learned empty-plate baseline) | **detachment — the #1 failure** | edge, OpenCV | ms/layer |
 | **L2** | Frame N vs N−1; is the silhouette growing monotonically? | delamination, support failure, partial drop-off | edge, OpenCV | ms/layer |
 | **L3** | Observed silhouette vs. expected cross-section from the sliced file | wrong file printed, missing regions, dead LCD pixels | edge + slicer parse | ms/layer |
-| **L4** | Cloud model reads the flagged frame | failure vs. reflection, failure classification, plain-language explanation | cloud | a few calls/print |
+| **L4** | A vision model reads the flagged frame | failure vs. reflection, failure classification, plain-language explanation | cloud — or local on the Jetson tier (§6.10) | a few calls/print |
 
 **L1 is the product.** L0 is a day's work and makes the box useful
 immediately. L2 is where it starts feeling intelligent. L3 is the real moat:
@@ -176,7 +178,7 @@ Four zones, three of which already exist:
 | Zone | Contents | Notes |
 | --- | --- | --- |
 | **Machine** | The resin printer. Camera + light aimed at it. | Not networked to us. We never touch it in v1. |
-| **Edge (the box)** | Raspberry Pi 5, USB webcam, red/IR light, optional HDMI screen. Four services. | Behind workshop NAT. Runs standalone when the network is down. |
+| **Edge (the box)** | Raspberry Pi 5 (base tier) or Jetson Orin Nano (judge tier, §6.10), USB webcam, red/IR light, optional HDMI screen. Four services. | Behind workshop NAT. Runs standalone when the network is down. |
 | **Cloud** | Next.js app on Vercel, Postgres (Neon), object storage (Cloudflare R2), cloud judge model. | |
 | **Clients** | Browser (dashboard), kiosk screen at the machine, phone notification. | |
 
@@ -210,7 +212,7 @@ deliberate (egress cost) and should appear as a distinct data path.
 | Dashboard app | exists | Auth (Google OAuth + email allowlist), recordings browser, device list, remote commands. |
 | Device API | exists | Bearer-token endpoints the Pi calls: heartbeat, command pull, command result. |
 | Events API | **new** | Receives inspection events and job lifecycle from the edge. |
-| Cloud judge | **new** | Server-side. Sends a flagged frame to a vision model, stores the verdict, decides whether to notify. |
+| Cloud judge | **new** | Server-side. Sends a flagged frame to a vision model, stores the verdict, decides whether to notify. On the Jetson tier the same judge interface runs locally (§6.10) and the API only records the verdict. |
 | Job & event UI | **new** | Per-print timeline with thumbnails, layer numbers, verdicts, and the layer timelapse. |
 | Kiosk route | **new** | Machine-side status page, designed for glanceability at three metres. |
 | Notifier | **new** | Fan-out to webhook / chat / push on confirmed failure. |
@@ -305,6 +307,13 @@ posts an event to our API, and our API decides whether a model call is
 warranted. This keeps model credentials in one place and makes per-print
 cloud cost enforceable server-side.
 
+On the Jetson tier (§6.10) step 5 has a local variant: the box runs the
+judge itself on the flagged thumbnail before posting, and the event arrives
+at the API already carrying a `cloud_verdict` (the field name stays; a
+`verdict_source` of `edge` | `cloud` distinguishes them). The API skips the
+cloud call when a verdict is present. Everything downstream — confirmation,
+notifier, kiosk — is identical.
+
 ### 6.7 Data model
 
 Existing tables: `allowed_emails`, `access_requests`, `devices`,
@@ -366,6 +375,27 @@ last few events. A physical light tower driven from the Pi's GPIO is a cheap
 later addition for people who want to read state from the far side of a
 workshop.
 
+### 6.10 Hardware tiers
+
+Two edge boards, one codebase. The inspection ladder is geometry, so it
+does not need a GPU; the judge does.
+
+| Tier | Board | What runs | Who it is for |
+| --- | --- | --- | --- |
+| **Base** | Raspberry Pi 5 | recorder, uploader, agent, inspector (L0–L3), kiosk. Judge (L4) in the cloud. | Default product. Lowest BOM and power. |
+| **Judge** | NVIDIA Jetson Orin Nano (Super) | Everything above, plus the L4 judge running locally on a small vision-language model. Frames never leave the workshop. | Sites that are offline, or that will not send images off-premises (dental and medical labs). Also the research bench (docs/RESEARCH.md). |
+
+The tier is a deployment choice, not a fork: same `pi/` code, same config
+schema, one extra service (`judge`) enabled on the Jetson tier. Neither
+board has a hardware H.264 encoder (Orin Nano lacks NVENC; Orin NX has it),
+so the recorder path is identical on both.
+
+Why not Jetson everywhere: L0–L3 run in milliseconds on a Pi 5 CPU; a
+GPU adds cost and power for no detection benefit. Why Jetson at all: a
+local judge closes the on-premises gap, and the learned baselines in the
+research plan need edge GPU to be compared fairly against the geometric
+ladder. See docs/RESEARCH.md.
+
 ---
 
 ## 7. Phases
@@ -376,7 +406,7 @@ workshop.
 | **1** | Camera tee + cycle lock + L0. | Layer count derived from video matches the printer's own count over a full print, ±2. Machine-stopped is reported within one cycle. Ring buffer verified torn-free. |
 | **2** | L1 detachment detection + event pipeline end to end. | A sabotaged print raises an event within 3 layers, visible on the dashboard with a thumbnail. Zero false positives across 3 clean prints. Events survive a network outage during the run. |
 | **3** | Kiosk screen + notification channel. | Operator at the machine sees live state without a laptop, including a truthful offline state. A failure reaches a phone within a minute. |
-| **4** | L2 + L4 cloud judgement. | Failure events carry a classification and a plain-language explanation. False-positive rate low enough to leave alerts on overnight for a week. |
+| **4** | L2 + L4 judgement — cloud on the base tier, local on the Jetson tier (§6.10). | Failure events carry a classification and a plain-language explanation. False-positive rate low enough to leave alerts on overnight for a week. Same verdict schema from either judge. |
 | **5** | L3 slice comparison, and auto-abort. | The box can stop a doomed print, not merely report it. |
 
 **On auto-abort**, the feature everyone asks for first: stopping the print is
@@ -425,12 +455,26 @@ Worst first.
   integration, no firmware, no cable into the machine.
 - A trained per-object model. L0–L3 are geometry, not learning, which is why
   the edge never needs a model pushed to it and why the box works on the
-  first print of an object it has never seen.
+  first print of an object it has never seen. (The Jetson tier's local
+  judge is a general-purpose vision model, not something trained per
+  object or per install.)
 - Multi-camera rigs. One camera, one machine, one box.
 
 ---
 
-## 10. Generalisation
+## 10. Research track
+
+The inspection build doubles as a research programme — the camera-outside-
+the-hood approach and the failure dataset it produces have no published
+precedent. Research questions, experiment design, baselines, and
+publication targets are in **docs/RESEARCH.md**; the failure-mode taxonomy
+that drives the induction protocol is in **docs/vigil-failure-modes.pdf**.
+The Jetson tier (§6.10) is the research bench where learned baselines are
+run against the geometric ladder.
+
+---
+
+## 11. Generalisation
 
 Nothing in §4–§6 is specific to resin. The box locks onto a cyclic machine's
 rhythm from video alone, learns what a good cycle looks like, and reports

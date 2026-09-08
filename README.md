@@ -53,8 +53,11 @@ the platform phases above.
 | 1 | Camera tee + cycle lock: find the layer rhythm from video alone | ⏳ |
 | 2 | Detachment detection + event pipeline | ⏳ |
 | 3 | Kiosk screen at the machine + notifications | ⏳ |
-| 4 | Cloud judgement on flagged frames | ⏳ |
+| 4 | Judgement on flagged frames — cloud, or local on the Jetson Orin Nano tier | ⏳ |
 | 5 | Slice-file comparison + auto-abort | ⏳ |
+
+First inspection task — detachment detection, step by step: **[docs/DETACHMENT.md](docs/DETACHMENT.md)**.
+Research track (dataset, baselines, paper): **[docs/RESEARCH.md](docs/RESEARCH.md)**.
 
 ---
 
